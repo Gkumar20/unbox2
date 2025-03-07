@@ -1,12 +1,13 @@
 const express = require('express');
 const app = express();
-const http = require('http').createServer(app);
-const io = require('socket.io')(http, {
+const server = require('http').createServer(app);
+const io = require('socket.io')(server, {
     cors: {
         origin: "*",
         methods: ["GET", "POST"],
         credentials: true
-    }
+    },
+    path: '/socket.io'
 });
 
 app.use(express.static('public'));
@@ -129,12 +130,17 @@ io.on('connection', (socket) => {
     });
 });
 
-// Update server listen with error handling
+// Update server listen for Vercel
 const PORT = process.env.PORT || 3000;
-http.listen(PORT, '0.0.0.0', (err) => {
-    if (err) {
-        console.error("Error starting server:", err);
-        return;
-    }
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+    server.listen(PORT, '0.0.0.0', (err) => {
+        if (err) {
+            console.error("Error starting server:", err);
+            return;
+        }
+        console.log(`Server running on http://localhost:${PORT}`);
+    });
+}
+
+// Export for Vercel
+module.exports = server;

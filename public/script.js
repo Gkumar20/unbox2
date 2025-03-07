@@ -1,4 +1,6 @@
-const socket = io();
+const socket = io({
+    path: '/socket.io'
+});
 let username = '';
 
 function joinChat() {
